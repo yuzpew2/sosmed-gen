@@ -16,7 +16,7 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
   const refreshPrompts = async () => {
     const res = await fetch('/api/prompts')
     if (res.ok) {
-      const data = await res.json()
+      const { prompts: data } = await res.json()
       setPrompts(data)
     }
   }

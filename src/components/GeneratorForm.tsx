@@ -1,20 +1,28 @@
 // src/components/GeneratorForm.tsx
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function GeneratorForm() {
   const [niche, setNiche] = useState('')
-  const promptOptions = [
-    { id: 1, name: 'General' },
-    { id: 2, name: 'Funny' },
-    { id: 3, name: 'Educational' },
-    { id: 4, name: 'Inspirational' },
-  ]
-  const [promptId, setPromptId] = useState(promptOptions[0].id)
+  const [prompts, setPrompts] = useState<{ id: number; name: string }[]>([])
+  const [promptId, setPromptId] = useState<number | null>(null)
   const [generatedPost, setGeneratedPost] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCopied, setIsCopied] = useState(false) // <-- TAMBAHAN BARU
+
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      const res = await fetch('/api/prompts')
+      const data = await res.json()
+      setPrompts(data)
+      if (data.length > 0) {
+        setPromptId(data[0].id)
+      }
+    }
+
+    fetchPrompts()
+  }, [])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -63,11 +71,11 @@ export default function GeneratorForm() {
           <label htmlFor="promptId" className="block text-sm font-medium">Jenis Gaya Penulisan</label>
           <select
             id="promptId"
-            value={promptId}
+            value={promptId ?? ''}
             onChange={(e) => setPromptId(Number(e.target.value))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
           >
-            {promptOptions.map((opt) => (
+            {prompts.map((opt) => (
               <option key={opt.id} value={opt.id}>
                 {opt.name}
               </option>

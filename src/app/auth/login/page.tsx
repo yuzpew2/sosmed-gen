@@ -28,7 +28,7 @@ export default function LoginPage() {
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
         providers={['google']}
-        redirectTo={`${location.origin}/auth/callback`}
+        redirectTo={`${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`}
       />
     </div>
   )

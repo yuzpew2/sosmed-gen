@@ -1,13 +1,26 @@
 // src/app/api/generate/route.ts
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { createClient } from '@/lib/supabase/server';
 
 // Inisialisasi Gemini AI Client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: Request) {
   try {
-    const { niche, promptType } = await request.json();
+    const { niche, promptId } = await request.json();
+
+    const supabase = await createClient();
+    const { data: promptRecord, error: promptError } = await supabase
+      .from('prompts')
+      .select('*')
+      .eq('id', promptId)
+      .single();
+    if (promptError || !promptRecord) {
+      throw new Error('Prompt not found');
+    }
+
+    const promptType = promptRecord.name;
 
     // 1. Dapatkan data terkini dari Google Search
     const searchUrl = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_SEARCH_API_KEY}&cx=${process.env.GOOGLE_CSE_ID}&q=${encodeURIComponent(niche)}`;
@@ -30,20 +43,11 @@ export async function POST(request: Request) {
 
     // 2. Bina prompt untuk Gemini
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const prompt = `
-      Anda adalah pakar media sosial. Tugas anda ialah mencipta satu posting media sosial yang berpotensi viral.
-
-      Topik/Niche: "${niche}"
-      Gaya Penulisan: "${promptType}"
-
-      Gunakan maklumat konteks di bawah untuk memastikan posting anda relevan dan terkini:
-      ---
-      Konteks dari Carian Google:
-      ${context}
-      ---
-
-      Sila hasilkan posting yang menarik, ringkas, dan sesuai untuk platform seperti Instagram atau Facebook. Sertakan hashtag yang relevan.
-    `;
+    const template = promptRecord.template;
+    const prompt = template
+      .replace(/\{\{niche\}\}/g, niche)
+      .replace(/\{\{promptType\}\}/g, promptType)
+      .replace(/\{\{context\}\}/g, context);
 
     // 3. Hantar permintaan ke Gemini AI
     const result = await model.generateContent(prompt);

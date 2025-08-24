@@ -16,20 +16,20 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { name, prompt } = await request.json()
-    if (!name || !prompt) {
-      return NextResponse.json({ error: 'Name and prompt are required' }, { status: 400 })
+    const { name, template } = await request.json()
+    if (!name || !template) {
+      return NextResponse.json({ error: 'Name and template are required' }, { status: 400 })
     }
 
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('prompts')
-      .insert({ name, prompt })
+      .insert({ name, template })
       .select()
       .single()
     if (error) throw error
 
-    return NextResponse.json({ prompt: data }, { status: 201 })
+    return NextResponse.json({ template: data }, { status: 201 })
   } catch (err) {
     console.error(err)
     return NextResponse.json({ error: 'Failed to create prompt' }, { status: 500 })
@@ -38,21 +38,21 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const { id, name, prompt } = await request.json()
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    const { id, name, template } = await request.json()
+    if (!id || !name || !template) {
+      return NextResponse.json({ error: 'ID, name, and template are required' }, { status: 400 })
     }
 
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('prompts')
-      .update({ name, prompt })
+      .update({ name, template })
       .eq('id', id)
       .select()
       .single()
     if (error) throw error
 
-    return NextResponse.json({ prompt: data }, { status: 200 })
+    return NextResponse.json({ template: data }, { status: 200 })
   } catch (err) {
     console.error(err)
     return NextResponse.json({ error: 'Failed to update prompt' }, { status: 500 })

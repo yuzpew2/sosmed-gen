@@ -5,7 +5,7 @@ import { useState } from 'react'
 interface Prompt {
   id: number
   name: string
-  prompt: string
+  template: string
 }
 
 export default function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] }) {
@@ -26,7 +26,7 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
     await fetch('/api/prompts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, prompt: promptText }),
+      body: JSON.stringify({ name, template: promptText }),
     })
     setName('')
     setPromptText('')
@@ -34,10 +34,11 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
   }
 
   const handleUpdate = async (p: Prompt) => {
+    const { id, name, template } = p
     await fetch('/api/prompts', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(p),
+      body: JSON.stringify({ id, name, template }),
     })
     refreshPrompts()
   }
@@ -56,14 +57,14 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
       <form onSubmit={handleCreate} className="space-y-2">
         <input
           className="border p-2 w-full"
-          placeholder="Prompt Name"
+          placeholder="Template Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
         <textarea
           className="border p-2 w-full"
-          placeholder="Prompt"
+          placeholder="Template"
           value={promptText}
           onChange={(e) => setPromptText(e.target.value)}
           required
@@ -89,11 +90,11 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
             />
             <textarea
               className="border p-2 w-full"
-              value={p.prompt}
+              value={p.template}
               onChange={(e) =>
                 setPrompts((prev) =>
                   prev.map((item) =>
-                    item.id === p.id ? { ...item, prompt: e.target.value } : item
+                    item.id === p.id ? { ...item, template: e.target.value } : item
                   )
                 )
               }

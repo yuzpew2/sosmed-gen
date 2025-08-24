@@ -14,7 +14,7 @@ export default function GeneratorForm() {
   useEffect(() => {
     const fetchPrompts = async () => {
       const res = await fetch('/api/prompts')
-      const data = await res.json()
+      const { prompts: data } = await res.json()
       setPrompts(data)
       if (data.length > 0) {
         setPromptId(data[0].id)

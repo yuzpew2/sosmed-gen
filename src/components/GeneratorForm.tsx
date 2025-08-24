@@ -5,7 +5,13 @@ import { useState } from 'react'
 
 export default function GeneratorForm() {
   const [niche, setNiche] = useState('')
-  const [promptType, setPromptType] = useState('General')
+  const promptOptions = [
+    { id: 1, name: 'General' },
+    { id: 2, name: 'Funny' },
+    { id: 3, name: 'Educational' },
+    { id: 4, name: 'Inspirational' },
+  ]
+  const [promptId, setPromptId] = useState(promptOptions[0].id)
   const [generatedPost, setGeneratedPost] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCopied, setIsCopied] = useState(false) // <-- TAMBAHAN BARU
@@ -18,7 +24,7 @@ export default function GeneratorForm() {
     const response = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ niche, promptType }),
+      body: JSON.stringify({ niche, promptId }),
     })
 
     const data = await response.json()
@@ -54,17 +60,18 @@ export default function GeneratorForm() {
           />
         </div>
         <div>
-          <label htmlFor="promptType" className="block text-sm font-medium">Jenis Gaya Penulisan</label>
+          <label htmlFor="promptId" className="block text-sm font-medium">Jenis Gaya Penulisan</label>
           <select
-            id="promptType"
-            value={promptType}
-            onChange={(e) => setPromptType(e.target.value)}
+            id="promptId"
+            value={promptId}
+            onChange={(e) => setPromptId(Number(e.target.value))}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
           >
-            <option>General</option>
-            <option>Funny</option>
-            <option>Educational</option>
-            <option>Inspirational</option>
+            {promptOptions.map((opt) => (
+              <option key={opt.id} value={opt.id}>
+                {opt.name}
+              </option>
+            ))}
           </select>
         </div>
         <button

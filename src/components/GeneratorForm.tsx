@@ -4,7 +4,10 @@
 import { useEffect, useState } from 'react'
 
 export default function GeneratorForm() {
-  const [niche, setNiche] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
+  const [videoId, setVideoId] = useState('')
+  const [summary, setSummary] = useState('')
+  const [taskId, setTaskId] = useState<string | null>(null)
   const [prompts, setPrompts] = useState<{ id: number; name: string }[]>([])
   const [promptId, setPromptId] = useState<number | null>(null)
   const [generatedPost, setGeneratedPost] = useState('')
@@ -24,20 +27,70 @@ export default function GeneratorForm() {
     fetchPrompts()
   }, [])
 
+  useEffect(() => {
+    if (!taskId) return
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`https://api-transcribe.yuslabs.xyz/api/result/${taskId}`)
+        const data = await res.json()
+        if (data.status === 'completed') {
+          setSummary(data.summary)
+          clearInterval(interval)
+          setTaskId(null)
+        } else if (data.status === 'failed') {
+          console.error('Transcription failed')
+          clearInterval(interval)
+          setTaskId(null)
+          setIsLoading(false)
+        }
+      } catch (err) {
+        console.error(err)
+        clearInterval(interval)
+        setTaskId(null)
+        setIsLoading(false)
+      }
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [taskId])
+
+  useEffect(() => {
+    if (!summary) return
+    const generatePost = async () => {
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ niche: summary, promptId }),
+        })
+        const data = await response.json()
+        setGeneratedPost(data.post)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    generatePost()
+  }, [summary, promptId])
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsLoading(true)
     setGeneratedPost('')
+    setSummary('')
 
-    const response = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ niche, promptId }),
-    })
-
-    const data = await response.json()
-    setGeneratedPost(data.post)
-    setIsLoading(false)
+    try {
+      const response = await fetch('https://api-transcribe.yuslabs.xyz/api/process-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoUrl, videoId }),
+      })
+      const data = await response.json()
+      setTaskId(data.taskId)
+    } catch (error) {
+      console.error(error)
+      setIsLoading(false)
+    }
   }
 
   // FUNGSI BARU UNTUK MENYALIN TEKS
@@ -56,14 +109,26 @@ export default function GeneratorForm() {
     <div className="w-full max-w-2xl mx-auto p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="niche" className="block text-sm font-medium">Niche/Topik Anda</label>
+          <label htmlFor="videoUrl" className="block text-sm font-medium">YouTube URL</label>
           <input
             type="text"
-            id="niche"
-            value={niche}
-            onChange={(e) => setNiche(e.target.value)}
+            id="videoUrl"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
-            placeholder="cth: Makanan sihat untuk atlet"
+            placeholder="https://www.youtube.com/watch?v=example"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="videoId" className="block text-sm font-medium">YouTube ID</label>
+          <input
+            type="text"
+            id="videoId"
+            value={videoId}
+            onChange={(e) => setVideoId(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
+            placeholder="example"
             required
           />
         </div>

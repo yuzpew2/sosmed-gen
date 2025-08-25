@@ -35,6 +35,30 @@ GOOGLE_SEARCH_API_KEY=YOUR_GOOGLE_SEARCH_API_KEY
 GOOGLE_CSE_ID=YOUR_SEARCH_ENGINE_ID
 
 
+## Transcription Service
+
+### Environment Variable
+
+Add the transcription service base URL to your `.env.local`:
+
+```
+TRANSCRIBE_API_BASE=https://api-transcribe.yuslabs.xyz
+```
+
+Replace the URL if you host your own transcription API.
+
+### Workflow
+
+1. Enter a YouTube URL and its corresponding video ID in the generator form.
+2. Submit the form to start a background transcription job. The server returns a `taskId`.
+3. The client polls the transcription endpoint every 3 seconds until the job finishes.
+4. Once transcription completes, the summary feeds the post generator and a styled post appears in the UI for editing or copying.
+
+**Notes:**
+
+- Transcribing long videos can take several minutes; keep the page open while the task runs.
+- Ensure `TRANSCRIBE_API_BASE` points to a reachable service or the transcription will fail.
+
 ## Getting Started
 
 1.  **Clone the repository:**

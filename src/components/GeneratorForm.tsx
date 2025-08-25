@@ -31,7 +31,7 @@ export default function GeneratorForm() {
     if (!taskId) return
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`https://api-transcribe.yuslabs.xyz/api/result/${taskId}`)
+        const res = await fetch(`/api/transcribe?taskId=${taskId}`)
         const data = await res.json()
         if (data.status === 'completed') {
           setSummary(data.summary)
@@ -80,7 +80,7 @@ export default function GeneratorForm() {
     setSummary('')
 
     try {
-      const response = await fetch('https://api-transcribe.yuslabs.xyz/api/process-video', {
+      const response = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoUrl, videoId }),

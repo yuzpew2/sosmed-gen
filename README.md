@@ -59,6 +59,10 @@ Replace the URL if you host your own transcription API.
 - Transcribing long videos can take several minutes; keep the page open while the task runs.
 - Ensure `TRANSCRIBE_API_BASE` points to a reachable service or the transcription will fail.
 
+## Rate Limiting
+
+The `/api/generate` and `/api/transcribe` endpoints are protected by an in-memory token bucket limiter allowing up to **10 requests per minute per IP address**. Requests above this threshold return `429 Too Many Requests` and are not forwarded to external services.
+
 ## Getting Started
 
 1.  **Clone the repository:**

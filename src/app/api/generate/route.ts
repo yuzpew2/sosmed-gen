@@ -2,11 +2,21 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@/lib/supabase/server';
+import { rateLimit } from '@/lib/rate-limit';
 
 // Inisialisasi Gemini AI Client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: Request) {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    'unknown';
+  if (!rateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429 },
+    );
+  }
   try {
     const { niche, promptId } = await request.json();
 

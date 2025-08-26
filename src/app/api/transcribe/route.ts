@@ -39,7 +39,9 @@ export async function POST(request: Request) {
     });
 
     if (!res.ok) {
-      throw new Error('Failed to start transcription');
+      const message = await res.text();
+      console.error(message);
+      return NextResponse.json({ error: message }, { status: res.status });
     }
 
     const data = await res.json();

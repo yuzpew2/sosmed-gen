@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     );
   }
   try {
-    const { videoUrl } = await request.json();
+    const { videoUrl, promptId } = await request.json();
     const videoId = extractVideoId(videoUrl);
     if (!videoId) {
       return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     const res = await fetch(`${BASE_URL}/api/process-video`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ videoUrl, videoId }),
+      body: JSON.stringify({ videoUrl, videoId, promptId }),
     });
 
     if (!res.ok) {

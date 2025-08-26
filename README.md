@@ -49,7 +49,7 @@ Replace the URL if you host your own transcription API.
 
 ### Workflow
 
-1. Enter a YouTube URL and its corresponding video ID in the generator form.
+1. Enter a YouTube URL in the generator form. The video ID is extracted automatically.
 2. Submit the form to start a background transcription job. The server returns a `taskId`.
 3. The client polls the transcription endpoint every 3 seconds until the job finishes.
 4. Once transcription completes, the summary feeds the post generator and a styled post appears in the UI for editing or copying.

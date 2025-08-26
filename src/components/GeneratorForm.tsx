@@ -3,9 +3,21 @@
 
 import { useEffect, useState } from 'react'
 
+function extractVideoId(url: string): string | null {
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname === 'youtu.be') {
+      return parsed.pathname.slice(1)
+    }
+    return parsed.searchParams.get('v')
+  } catch {
+    const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:&|$)/)
+    return match ? match[1] : null
+  }
+}
+
 export default function GeneratorForm() {
   const [videoUrl, setVideoUrl] = useState('')
-  const [videoId, setVideoId] = useState('')
   const [summary, setSummary] = useState('')
   const [taskId, setTaskId] = useState<string | null>(null)
   const [prompts, setPrompts] = useState<{ id: number; name: string }[]>([])
@@ -80,10 +92,14 @@ export default function GeneratorForm() {
     setSummary('')
 
     try {
+      const videoId = extractVideoId(videoUrl)
+      if (!videoId) {
+        throw new Error('Invalid YouTube URL')
+      }
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoUrl, videoId }),
+        body: JSON.stringify({ videoUrl }),
       })
       const data = await response.json()
       setTaskId(data.taskId)
@@ -117,18 +133,6 @@ export default function GeneratorForm() {
             onChange={(e) => setVideoUrl(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
             placeholder="https://www.youtube.com/watch?v=example"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="videoId" className="block text-sm font-medium">YouTube ID</label>
-          <input
-            type="text"
-            id="videoId"
-            value={videoId}
-            onChange={(e) => setVideoId(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
-            placeholder="example"
             required
           />
         </div>

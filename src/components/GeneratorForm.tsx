@@ -99,7 +99,7 @@ export default function GeneratorForm() {
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoUrl }),
+        body: JSON.stringify({ videoUrl, promptId }),
       })
       const data = await response.json()
       setTaskId(data.taskId)

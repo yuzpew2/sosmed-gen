@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+const MAX_TEMPLATE_LENGTH = 2000
+
+function sanitizeTemplate(input: string) {
+  const withoutScripts = input.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+  return withoutScripts
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export async function GET() {
   try {
     const supabase = await createClient()
@@ -20,11 +32,19 @@ export async function POST(request: Request) {
     if (!name || !template) {
       return NextResponse.json({ error: 'Name and template are required' }, { status: 400 })
     }
+    if (template.length > MAX_TEMPLATE_LENGTH) {
+      return NextResponse.json(
+        { error: 'Template exceeds maximum length' },
+        { status: 400 }
+      )
+    }
+
+    const sanitizedTemplate = sanitizeTemplate(template)
 
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('prompts')
-      .insert({ name, template })
+      .insert({ name, template: sanitizedTemplate })
       .select()
       .single()
     if (error) throw error
@@ -42,11 +62,19 @@ export async function PUT(request: Request) {
     if (!id || !name || !template) {
       return NextResponse.json({ error: 'ID, name, and template are required' }, { status: 400 })
     }
+    if (template.length > MAX_TEMPLATE_LENGTH) {
+      return NextResponse.json(
+        { error: 'Template exceeds maximum length' },
+        { status: 400 }
+      )
+    }
+
+    const sanitizedTemplate = sanitizeTemplate(template)
 
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('prompts')
-      .update({ name, template })
+      .update({ name, template: sanitizedTemplate })
       .eq('id', id)
       .select()
       .single()

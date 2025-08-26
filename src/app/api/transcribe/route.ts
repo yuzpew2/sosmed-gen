@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
+import { rateLimit } from '@/lib/rate-limit';
 
 const BASE_URL = process.env.TRANSCRIBE_API_BASE || 'https://api-transcribe.yuslabs.xyz';
 
 export async function POST(request: Request) {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    'unknown';
+  if (!rateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429 },
+    );
+  }
   try {
     const { videoUrl, videoId } = await request.json();
     const res = await fetch(`${BASE_URL}/api/process-video`, {
@@ -24,6 +34,15 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    'unknown';
+  if (!rateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429 },
+    );
+  }
   const { searchParams } = new URL(request.url);
   const taskId = searchParams.get('taskId');
 

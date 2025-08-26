@@ -42,7 +42,7 @@ GOOGLE_CSE_ID=YOUR_SEARCH_ENGINE_ID
 Add the transcription service base URL to your `.env.local`:
 
 ```
-TRANSCRIBE_API_BASE=https://api-transcribe.yuslabs.xyz
+TRANSCRIBE_API_BASE=<external transcribe service>
 ```
 
 Replace the URL if you host your own transcription API.

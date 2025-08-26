@@ -3,6 +3,19 @@ import { rateLimit } from '@/lib/rate-limit';
 
 const BASE_URL = process.env.TRANSCRIBE_API_BASE || 'https://api-transcribe.yuslabs.xyz';
 
+function extractVideoId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname === 'youtu.be') {
+      return parsed.pathname.slice(1);
+    }
+    return parsed.searchParams.get('v');
+  } catch {
+    const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})(?:&|$)/);
+    return match ? match[1] : null;
+  }
+}
+
 export async function POST(request: Request) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
@@ -14,7 +27,11 @@ export async function POST(request: Request) {
     );
   }
   try {
-    const { videoUrl, videoId } = await request.json();
+    const { videoUrl } = await request.json();
+    const videoId = extractVideoId(videoUrl);
+    if (!videoId) {
+      return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
+    }
     const res = await fetch(`${BASE_URL}/api/process-video`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -17,6 +17,11 @@ export default async function Navbar() {
           <Link href="/prompts" className="hover:underline">
             Prompts
           </Link>
+          {user && (
+            <Link href="/posts" className="hover:underline">
+              Posts
+            </Link>
+          )}
         </div>
         <div className="flex items-center space-x-4">
           {user && <span className="text-sm">Hello, {user.email}</span>}

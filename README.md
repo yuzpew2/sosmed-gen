@@ -61,9 +61,7 @@ Replace the URL if you host your own transcription API.
 
 ## Rate Limiting
 
-POST requests to the `/api/generate` and `/api/transcribe` endpoints are protected by an in-memory token bucket limiter allowing up to **10 requests per minute per IP address**. Requests above this threshold return `429 Too Many Requests` and are not forwarded to external services.
 
-The GET operation for `/api/transcribe` is not rate limited.
 
 ## Getting Started
 

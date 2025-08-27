@@ -8,9 +8,10 @@ const MAX_TOKENS = 10;
 const REFILL_WINDOW_MS = 60_000; // 1 minute
 const REFILL_RATE = MAX_TOKENS / REFILL_WINDOW_MS; // tokens per ms
 
-export function rateLimit(identifier: string): boolean {
+export function rateLimit(method: string, identifier: string): boolean {
+  const key = `${method}:${identifier}`;
   const now = Date.now();
-  const bucket = buckets.get(identifier) ?? {
+  const bucket = buckets.get(key) ?? {
     tokens: MAX_TOKENS,
     lastRefill: now,
   };
@@ -23,12 +24,12 @@ export function rateLimit(identifier: string): boolean {
   bucket.lastRefill = now;
 
   if (bucket.tokens < 1) {
-    buckets.set(identifier, bucket);
+    buckets.set(key, bucket);
     return false;
   }
 
   bucket.tokens -= 1;
-  buckets.set(identifier, bucket);
+  buckets.set(key, bucket);
   return true;
 }
 

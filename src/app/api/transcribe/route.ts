@@ -53,15 +53,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    'unknown';
-  if (!rateLimit(request.method, ip)) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 },
-    );
-  }
+
   const { searchParams } = new URL(request.url);
   const taskId = searchParams.get('taskId');
 

@@ -76,6 +76,16 @@ export default function GeneratorForm() {
         })
         const data = await response.json()
         setGeneratedPost(data.post)
+
+        try {
+          await fetch('/api/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: data.post, status: 'draft' }),
+          })
+        } catch (err) {
+          console.error(err)
+        }
       } catch (err) {
         console.error(err)
       } finally {

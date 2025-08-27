@@ -61,9 +61,7 @@ Replace the URL if you host your own transcription API.
 
 ## Rate Limiting
 
-Only POST endpoints such as `/api/generate` and `/api/transcribe` are subject to the server's in-memory token bucket limiter. By default each IP may make up to **10 POST requests per minute**; additional POSTs receive `429 Too Many Requests` and are not forwarded to external services.
 
-GET requests are unrestricted unless you assign them their own bucket. For example, you might configure a separate bucket allowing **60 GET requests per minute** so that GET traffic does not consume the POST allocation.
 
 ## Getting Started
 

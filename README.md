@@ -19,6 +19,15 @@ Sosmed Gen is a web application designed to help users generate social media pos
 * **Web Search:** Google Programmable Search Engine
 * **Deployment:** Vercel
 
+## Styling Conventions
+
+This project uses [Tailwind CSS](https://tailwindcss.com/) with the [DaisyUI](https://daisyui.com/) component library and a custom `mytheme` defined in `tailwind.config.ts`. To keep styles consistent:
+
+- Reuse the design primitives in `src/components/ui` (`Button`, `Input`, `Textarea`, `Select`) instead of ad-hoc class combinations.
+- Prefer DaisyUI component classes such as `card`, `badge`, `navbar`, and `btn` to handle colors and spacing.
+- Wrap pages with the `container` utility to maintain consistent horizontal padding.
+- When introducing new interactive elements (forms, modals, etc.), extend the `ui` component set so future changes propagate across the app.
+
 ## Environment Variables Setup
 
 To run this project, you need to create a `.env.local` file in the root directory and add the following environment variables. Obtain these keys from their respective platforms.

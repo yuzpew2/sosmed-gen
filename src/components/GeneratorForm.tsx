@@ -3,6 +3,10 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Button from './ui/Button'
+import Input from './ui/Input'
+import Textarea from './ui/Textarea'
+import Select from './ui/Select'
 
 function extractVideoId(url: string): string | null {
   try {
@@ -143,39 +147,39 @@ export default function GeneratorForm() {
     <div className="w-full max-w-2xl mx-auto p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="videoUrl" className="block text-sm font-medium">YouTube URL</label>
-          <input
+          <label htmlFor="videoUrl" className="block text-sm font-medium">
+            YouTube URL
+          </label>
+          <Input
             type="text"
             id="videoUrl"
             value={videoUrl}
             onChange={(e) => setVideoUrl(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
+            className="mt-1"
             placeholder="https://www.youtube.com/watch?v=example"
             required
           />
         </div>
         <div>
-          <label htmlFor="promptId" className="block text-sm font-medium">Jenis Gaya Penulisan</label>
-          <select
+          <label htmlFor="promptId" className="block text-sm font-medium">
+            Jenis Gaya Penulisan
+          </label>
+          <Select
             id="promptId"
             value={promptId ?? ''}
             onChange={(e) => setPromptId(Number(e.target.value))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-black p-2"
+            className="mt-1"
           >
             {prompts.map((opt) => (
               <option key={opt.id} value={opt.id}>
                 {opt.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
+        <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? 'Menjana...' : 'Jana Teks'}
-        </button>
+        </Button>
       </form>
 
       {error && <p className="mt-4 text-red-500">{error}</p>}
@@ -183,19 +187,20 @@ export default function GeneratorForm() {
       {generatedText && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold">Hasil Jana:</h3>
-          <textarea
+          <Textarea
             value={generatedText}
             onChange={(e) => setGeneratedText(e.target.value)}
-            className="mt-2 block w-full h-48 rounded-md border-gray-300 shadow-sm text-black p-2"
+            className="mt-2 h-48"
           />
           {/* BUTANG SALIN BARU DI SINI */}
-          <button
+          <Button
             type="button"
             onClick={handleCopy}
-            className="mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            variant="success"
+            className="mt-2"
           >
             {isCopied ? 'Tersalin!' : 'Salin Teks'}
-          </button>
+          </Button>
         </div>
       )}
     </div>

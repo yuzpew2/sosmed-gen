@@ -1,6 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Button from '@/components/ui/Button'
+import Textarea from '@/components/ui/Textarea'
+import Select from '@/components/ui/Select'
 
 type Task = {
   id: number
@@ -72,41 +75,36 @@ export default function PostsPage() {
   }
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
+    <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Tasks</h1>
       {tasks.map((task) => (
-        <div key={task.id} className="border p-4 mb-4 rounded">
+        <div key={task.id} className="card bg-base-100 shadow p-4 mb-4">
           {editingId === task.id ? (
             <>
               <p className="break-words">{task.videoUrl}</p>
               <p className="mt-1">Prompt: {task.prompt_id}</p>
-              <textarea
-                className="w-full rounded text-black p-2 mt-2"
+              <Textarea
+                className="mt-2"
                 value={editResult}
                 onChange={(e) => setEditResult(e.target.value)}
               />
-              <select
-                className="mt-2 p-2 rounded text-black"
+              <Select
+                className="mt-2"
                 value={editStatus}
                 onChange={(e) => setEditStatus(e.target.value)}
               >
                 <option value="draft">draft</option>
                 <option value="posted">posted</option>
-              </select>
+              </Select>
               <p className="mt-2 whitespace-pre-wrap">{task.summary}</p>
               <div className="mt-2 space-x-2">
-                <button
-                  onClick={() => handleUpdate(task.id)}
-                  className="bg-blue-600 text-white px-3 py-1 rounded"
-                >
-                  Save
-                </button>
-                <button
+                <Button onClick={() => handleUpdate(task.id)}>Save</Button>
+                <Button
                   onClick={() => setEditingId(null)}
-                  className="bg-gray-300 text-black px-3 py-1 rounded"
+                  variant="secondary"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </>
           ) : (
@@ -114,29 +112,27 @@ export default function PostsPage() {
               <p className="break-words">{task.videoUrl}</p>
               <p>Prompt: {task.prompt_id}</p>
               <p className="mt-2 whitespace-pre-wrap">{task.result}</p>
-              <span className="inline-block mt-2 px-2 py-1 text-sm bg-gray-200 rounded">
-                {task.status}
-              </span>
+              <span className="badge mt-2">{task.status}</span>
               <p className="mt-2 whitespace-pre-wrap">{task.summary}</p>
               <div className="mt-2 space-x-2">
-                <button
+                <Button
                   onClick={() => startEditing(task)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded"
+                  variant="warning"
                 >
                   Edit
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleDelete(task.id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded"
+                  variant="error"
                 >
                   Delete
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => navigator.clipboard.writeText(task.result)}
-                  className="bg-green-600 text-white px-3 py-1 rounded"
+                  variant="success"
                 >
                   Copy
-                </button>
+                </Button>
               </div>
             </>
           )}

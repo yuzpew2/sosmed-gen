@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Button from '@/components/ui/Button'
+import Input from '@/components/ui/Input'
+import Textarea from '@/components/ui/Textarea'
 
 interface Prompt {
   id: number
@@ -55,30 +58,25 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
   return (
     <div className="space-y-6">
       <form onSubmit={handleCreate} className="space-y-2">
-        <input
-          className="border p-2 w-full"
+        <Input
           placeholder="Template Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
-        <textarea
-          className="border p-2 w-full"
+        <Textarea
           placeholder="Template"
           value={promptText}
           onChange={(e) => setPromptText(e.target.value)}
           required
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-          Save
-        </button>
+        <Button type="submit">Save</Button>
       </form>
 
       <ul className="space-y-4">
         {prompts.map((p) => (
           <li key={p.id} className="border p-4 space-y-2">
-            <input
-              className="border p-2 w-full"
+            <Input
               value={p.name}
               onChange={(e) =>
                 setPrompts((prev) =>
@@ -88,32 +86,29 @@ export default function PromptsManager({ initialPrompts }: { initialPrompts: Pro
                 )
               }
             />
-            <textarea
-              className="border p-2 w-full"
+            <Textarea
               value={p.template}
               onChange={(e) =>
                 setPrompts((prev) =>
                   prev.map((item) =>
-                    item.id === p.id ? { ...item, template: e.target.value } : item
+                    item.id === p.id
+                      ? { ...item, template: e.target.value }
+                      : item
                   )
                 )
               }
             />
             <div className="flex gap-2">
-              <button
-                type="button"
-                className="bg-green-600 text-white px-3 py-1 rounded"
-                onClick={() => handleUpdate(p)}
-              >
+              <Button type="button" variant="success" onClick={() => handleUpdate(p)}>
                 Update
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
-                className="bg-red-600 text-white px-3 py-1 rounded"
+                variant="error"
                 onClick={() => handleDelete(p.id)}
               >
                 Delete
-              </button>
+              </Button>
             </div>
           </li>
         ))}

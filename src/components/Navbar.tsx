@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Button from "./ui/Button";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -8,30 +9,27 @@ export default async function Navbar() {
   } = await supabase.auth.getUser();
 
   return (
-    <nav className="bg-gray-800 text-white">
-      <div className="max-w-4xl mx-auto flex justify-between items-center p-4">
-        <div className="flex space-x-4">
-          <Link href="/" className="hover:underline">
+    <nav className="navbar bg-primary text-primary-content">
+      <div className="max-w-4xl mx-auto flex justify-between items-center w-full px-4">
+        <div className="flex gap-2">
+          <Link href="/" className="btn btn-ghost">
             Home
           </Link>
-          <Link href="/prompts" className="hover:underline">
+          <Link href="/prompts" className="btn btn-ghost">
             Prompts
           </Link>
           {user && (
-            <Link href="/posts" className="hover:underline">
+            <Link href="/posts" className="btn btn-ghost">
               Posts
             </Link>
           )}
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-2">
           {user && <span className="text-sm">Hello, {user.email}</span>}
           <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              className="text-sm bg-gray-600 hover:bg-gray-700 py-1 px-3 rounded"
-            >
+            <Button type="submit" variant="secondary" className="text-sm">
               Sign out
-            </button>
+            </Button>
           </form>
         </div>
       </div>

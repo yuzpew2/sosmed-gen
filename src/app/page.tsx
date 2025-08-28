@@ -12,7 +12,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-4">
+    <div className="container mx-auto min-h-screen flex flex-col items-center p-4">
       <h1 className="text-3xl font-bold mt-8 mb-4">Sosmed Gen</h1>
       <p className="mb-8">
         Masukkan niche anda dan pilih gaya penulisan untuk menjana posting media sosial.

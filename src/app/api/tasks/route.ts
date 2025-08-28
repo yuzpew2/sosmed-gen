@@ -8,7 +8,7 @@ export async function GET() {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('tasks')
-      .select('id, created_at, video_URL, prompt_id, status, result, summary')
+      .select('id, created_at, video_url, prompt_id, status, result, summary')
       .order('created_at', { ascending: false })
     if (error) throw error
     return NextResponse.json({ tasks: data }, { status: 200 })
@@ -29,7 +29,7 @@ export async function PUT(request: Request) {
       .from('tasks')
       .update({ result, status, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .select('id, created_at, video_URL, prompt_id, status, result, summary, updated_at')
+      .select('id, created_at, video_url, prompt_id, status, result, summary, updated_at')
       .single()
     if (error) throw error
     return NextResponse.json({ task: data }, { status: 200 })

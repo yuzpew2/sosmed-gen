@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react'
 type Task = {
   id: number
   created_at: string
-  video_URL: string
+  videoUrl: string
   prompt_id: number
   status: string
   result: string
   summary: string
 }
+
+type RawTask = Omit<Task, 'videoUrl'> & { video_url: string }
 
 export default function PostsPage() {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -22,7 +24,11 @@ export default function PostsPage() {
     try {
       const res = await fetch('/api/tasks', { cache: 'no-store' })
       const data = await res.json()
-      setTasks(data.tasks || [])
+      const tasks = (data.tasks || []).map((t: RawTask): Task => ({
+        ...t,
+        videoUrl: t.video_url,
+      }))
+      setTasks(tasks)
     } catch (err) {
       console.error(err)
     }
@@ -72,7 +78,7 @@ export default function PostsPage() {
         <div key={task.id} className="border p-4 mb-4 rounded">
           {editingId === task.id ? (
             <>
-              <p className="break-words">{task.video_URL}</p>
+              <p className="break-words">{task.videoUrl}</p>
               <p className="mt-1">Prompt: {task.prompt_id}</p>
               <textarea
                 className="w-full rounded text-black p-2 mt-2"
@@ -105,7 +111,7 @@ export default function PostsPage() {
             </>
           ) : (
             <>
-              <p className="break-words">{task.video_URL}</p>
+              <p className="break-words">{task.videoUrl}</p>
               <p>Prompt: {task.prompt_id}</p>
               <p className="mt-2 whitespace-pre-wrap">{task.result}</p>
               <span className="inline-block mt-2 px-2 py-1 text-sm bg-gray-200 rounded">

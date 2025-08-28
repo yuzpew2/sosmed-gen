@@ -16,7 +16,7 @@ export default function PostsPage() {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch('/api/posts')
+      const res = await fetch('/api/posts', { cache: 'no-store' })
       const data = await res.json()
       setPosts(data.posts || [])
     } catch (err) {
@@ -36,14 +36,13 @@ export default function PostsPage() {
 
   const handleUpdate = async (id: number) => {
     try {
-      const res = await fetch('/api/posts', {
+      await fetch('/api/posts', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, content: editContent, status: editStatus }),
       })
-      const data = await res.json()
-      setPosts(posts.map((p) => (p.id === id ? data.post : p)))
       setEditingId(null)
+      await fetchPosts()
     } catch (err) {
       console.error(err)
     }
@@ -56,7 +55,7 @@ export default function PostsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       })
-      setPosts(posts.filter((p) => p.id !== id))
+      await fetchPosts()
     } catch (err) {
       console.error(err)
     }

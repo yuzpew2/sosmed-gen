@@ -19,6 +19,55 @@ Sosmed Gen is a web application designed to help users generate social media pos
 * **Web Search:** Google Programmable Search Engine
 * **Deployment:** Vercel
 
+## Styling Conventions
+
+### Extending `mytheme`
+
+Tailwind's configuration lives in `tailwind.config.ts`. To add project‑specific
+tokens, extend the `mytheme` section inside `theme.extend`:
+
+```ts
+// tailwind.config.ts
+import type { Config } from "tailwindcss";
+
+export default {
+  theme: {
+    extend: {
+      mytheme: {
+        colors: {
+          brand: "#1c64f2",
+        },
+      },
+    },
+  },
+} satisfies Config;
+```
+
+### Naming new UI components
+
+Create reusable primitives in `src/components/ui` using PascalCase file and
+component names. Variants should be lowercase and hyphenated, e.g.
+`alert-success`, `alert-error`.
+
+### Example: `Alert` component
+
+```tsx
+// src/components/ui/Alert.tsx
+interface AlertProps {
+  variant?: "success" | "error";
+  children: React.ReactNode;
+}
+
+export function Alert({ variant = "success", children }: AlertProps) {
+  const variantClass = {
+    success: "alert-success",
+    error: "alert-error",
+  }[variant];
+
+  return <div className={variantClass}>{children}</div>;
+}
+```
+
 ## Environment Variables Setup
 
 To run this project, you need to create a `.env.local` file in the root directory and add the following environment variables. Obtain these keys from their respective platforms.

@@ -2,47 +2,51 @@
 
 import { useEffect, useState } from 'react'
 
-type Post = {
+type Task = {
   id: number
-  content: string
+  created_at: string
+  video_URL: string
+  prompt_id: number
   status: string
+  result: string
+  summary: string
 }
 
 export default function PostsPage() {
-  const [posts, setPosts] = useState<Post[]>([])
+  const [tasks, setTasks] = useState<Task[]>([])
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [editContent, setEditContent] = useState('')
+  const [editResult, setEditResult] = useState('')
   const [editStatus, setEditStatus] = useState('draft')
 
-  const fetchPosts = async () => {
+  const fetchTasks = async () => {
     try {
-      const res = await fetch('/api/posts', { cache: 'no-store' })
+      const res = await fetch('/api/tasks', { cache: 'no-store' })
       const data = await res.json()
-      setPosts(data.posts || [])
+      setTasks(data.tasks || [])
     } catch (err) {
       console.error(err)
     }
   }
 
   useEffect(() => {
-    fetchPosts()
+    fetchTasks()
   }, [])
 
-  const startEditing = (post: Post) => {
-    setEditingId(post.id)
-    setEditContent(post.content)
-    setEditStatus(post.status)
+  const startEditing = (task: Task) => {
+    setEditingId(task.id)
+    setEditResult(task.result)
+    setEditStatus(task.status)
   }
 
   const handleUpdate = async (id: number) => {
     try {
-      await fetch('/api/posts', {
+      await fetch('/api/tasks', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, content: editContent, status: editStatus }),
+        body: JSON.stringify({ id, result: editResult, status: editStatus }),
       })
       setEditingId(null)
-      await fetchPosts()
+      await fetchTasks()
     } catch (err) {
       console.error(err)
     }
@@ -50,32 +54,30 @@ export default function PostsPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await fetch('/api/posts', {
+      await fetch('/api/tasks', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       })
-      await fetchPosts()
+      await fetchTasks()
     } catch (err) {
       console.error(err)
     }
   }
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-  }
-
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Posts</h1>
-      {posts.map((post) => (
-        <div key={post.id} className="border p-4 mb-4 rounded">
-          {editingId === post.id ? (
+      <h1 className="text-2xl font-bold mb-4">Tasks</h1>
+      {tasks.map((task) => (
+        <div key={task.id} className="border p-4 mb-4 rounded">
+          {editingId === task.id ? (
             <>
+              <p className="break-words">{task.video_URL}</p>
+              <p className="mt-1">Prompt: {task.prompt_id}</p>
               <textarea
-                className="w-full rounded text-black p-2"
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full rounded text-black p-2 mt-2"
+                value={editResult}
+                onChange={(e) => setEditResult(e.target.value)}
               />
               <select
                 className="mt-2 p-2 rounded text-black"
@@ -85,9 +87,10 @@ export default function PostsPage() {
                 <option value="draft">draft</option>
                 <option value="posted">posted</option>
               </select>
+              <p className="mt-2 whitespace-pre-wrap">{task.summary}</p>
               <div className="mt-2 space-x-2">
                 <button
-                  onClick={() => handleUpdate(post.id)}
+                  onClick={() => handleUpdate(task.id)}
                   className="bg-blue-600 text-white px-3 py-1 rounded"
                 >
                   Save
@@ -102,25 +105,28 @@ export default function PostsPage() {
             </>
           ) : (
             <>
-              <p className="whitespace-pre-wrap">{post.content}</p>
+              <p className="break-words">{task.video_URL}</p>
+              <p>Prompt: {task.prompt_id}</p>
+              <p className="mt-2 whitespace-pre-wrap">{task.result}</p>
               <span className="inline-block mt-2 px-2 py-1 text-sm bg-gray-200 rounded">
-                {post.status}
+                {task.status}
               </span>
+              <p className="mt-2 whitespace-pre-wrap">{task.summary}</p>
               <div className="mt-2 space-x-2">
                 <button
-                  onClick={() => startEditing(post)}
+                  onClick={() => startEditing(task)}
                   className="bg-yellow-500 text-white px-3 py-1 rounded"
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(post.id)}
+                  onClick={() => handleDelete(task.id)}
                   className="bg-red-600 text-white px-3 py-1 rounded"
                 >
                   Delete
                 </button>
                 <button
-                  onClick={() => handleCopy(post.content)}
+                  onClick={() => navigator.clipboard.writeText(task.result)}
                   className="bg-green-600 text-white px-3 py-1 rounded"
                 >
                   Copy

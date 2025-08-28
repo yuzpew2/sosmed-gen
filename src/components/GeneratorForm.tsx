@@ -2,6 +2,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 function extractVideoId(url: string): string | null {
   try {
@@ -17,6 +18,7 @@ function extractVideoId(url: string): string | null {
 }
 
 export default function GeneratorForm() {
+  const router = useRouter()
   const [videoUrl, setVideoUrl] = useState('')
   const [summary, setSummary] = useState('')
   const [taskId, setTaskId] = useState<string | null>(null)
@@ -83,11 +85,14 @@ export default function GeneratorForm() {
         setGeneratedPost(data.post)
 
         try {
-          await fetch('/api/posts', {
+          const res = await fetch('/api/posts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: data.post, status: 'draft' }),
           })
+          if (res.ok) {
+            router.refresh()
+          }
         } catch (err) {
           console.error(err)
         }
@@ -99,7 +104,7 @@ export default function GeneratorForm() {
       }
     }
     generatePost()
-  }, [summary, promptId])
+  }, [summary, promptId, router])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()

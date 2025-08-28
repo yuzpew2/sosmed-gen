@@ -24,7 +24,7 @@ export default function GeneratorForm() {
   const [taskId, setTaskId] = useState<string | null>(null)
   const [prompts, setPrompts] = useState<{ id: number; name: string }[]>([])
   const [promptId, setPromptId] = useState<number | null>(null)
-  const [generatedPost, setGeneratedPost] = useState('')
+  const [generatedText, setGeneratedText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCopied, setIsCopied] = useState(false) // <-- TAMBAHAN BARU
   const [error, setError] = useState<string | null>(null)
@@ -51,7 +51,6 @@ export default function GeneratorForm() {
         if (data.status === 'completed') {
           setSummary(data.summary)
           clearInterval(interval)
-          setTaskId(null)
         } else if (data.status === 'failed') {
           console.error('Transcription failed')
           clearInterval(interval)
@@ -70,7 +69,7 @@ export default function GeneratorForm() {
 
   useEffect(() => {
     if (!summary) return
-    const generatePost = async () => {
+    const generateText = async () => {
       try {
         const response = await fetch('/api/generate', {
           method: 'POST',
@@ -78,26 +77,35 @@ export default function GeneratorForm() {
           body: JSON.stringify({ niche: summary, promptId }),
         })
         if (!response.ok) {
-          setError('Failed to generate post')
+          setError('Failed to generate text')
           return
         }
         const data = await response.json()
-        setGeneratedPost(data.post)
+        setGeneratedText(data.post)
+
+        if (taskId) {
+          await fetch('/api/tasks', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: taskId, result: data.post, status: 'draft' }),
+          })
+          router.refresh()
+        }
 
       } catch (err) {
         console.error(err)
-        setError('Failed to generate post')
+        setError('Failed to generate text')
       } finally {
         setIsLoading(false)
       }
     }
-    generatePost()
-  }, [summary, promptId, router])
+    generateText()
+  }, [summary, promptId, taskId, router])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     setIsLoading(true)
-    setGeneratedPost('')
+    setGeneratedText('')
     setSummary('')
     setError(null)
 
@@ -121,8 +129,8 @@ export default function GeneratorForm() {
 
   // FUNGSI BARU UNTUK MENYALIN TEKS
   const handleCopy = () => {
-    if (generatedPost) {
-      navigator.clipboard.writeText(generatedPost).then(() => {
+    if (generatedText) {
+      navigator.clipboard.writeText(generatedText).then(() => {
         setIsCopied(true)
         setTimeout(() => {
           setIsCopied(false)
@@ -166,18 +174,18 @@ export default function GeneratorForm() {
           disabled={isLoading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          {isLoading ? 'Menjana...' : 'Jana Posting'}
+          {isLoading ? 'Menjana...' : 'Jana Teks'}
         </button>
       </form>
 
       {error && <p className="mt-4 text-red-500">{error}</p>}
 
-      {generatedPost && (
+      {generatedText && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold">Hasil Jana:</h3>
           <textarea
-            value={generatedPost}
-            onChange={(e) => setGeneratedPost(e.target.value)}
+            value={generatedText}
+            onChange={(e) => setGeneratedText(e.target.value)}
             className="mt-2 block w-full h-48 rounded-md border-gray-300 shadow-sm text-black p-2"
           />
           {/* BUTANG SALIN BARU DI SINI */}

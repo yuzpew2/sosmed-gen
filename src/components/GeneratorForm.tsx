@@ -84,18 +84,6 @@ export default function GeneratorForm() {
         const data = await response.json()
         setGeneratedPost(data.post)
 
-        try {
-          const res = await fetch('/api/posts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: data.post, status: 'draft' }),
-          })
-          if (res.ok) {
-            router.refresh()
-          }
-        } catch (err) {
-          console.error(err)
-        }
       } catch (err) {
         console.error(err)
         setError('Failed to generate post')

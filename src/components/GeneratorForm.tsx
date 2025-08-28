@@ -25,6 +25,7 @@ export default function GeneratorForm() {
   const [generatedPost, setGeneratedPost] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isCopied, setIsCopied] = useState(false) // <-- TAMBAHAN BARU
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchPrompts = async () => {
@@ -74,6 +75,10 @@ export default function GeneratorForm() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ niche: summary, promptId }),
         })
+        if (!response.ok) {
+          setError('Failed to generate post')
+          return
+        }
         const data = await response.json()
         setGeneratedPost(data.post)
 
@@ -88,6 +93,7 @@ export default function GeneratorForm() {
         }
       } catch (err) {
         console.error(err)
+        setError('Failed to generate post')
       } finally {
         setIsLoading(false)
       }
@@ -100,6 +106,7 @@ export default function GeneratorForm() {
     setIsLoading(true)
     setGeneratedPost('')
     setSummary('')
+    setError(null)
 
     try {
       const videoId = extractVideoId(videoUrl)
@@ -169,6 +176,8 @@ export default function GeneratorForm() {
           {isLoading ? 'Menjana...' : 'Jana Posting'}
         </button>
       </form>
+
+      {error && <p className="mt-4 text-red-500">{error}</p>}
 
       {generatedPost && (
         <div className="mt-8">

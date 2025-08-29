@@ -100,9 +100,9 @@ export default function PostsPage() {
                     </span>
                   </td>
                   <td className="p-2">
-                    {task.summary.length > 50
-                      ? task.summary.slice(0, 50) + '…'
-                      : task.summary}
+                    {(task.summary?.length ?? 0) > 50
+                      ? (task.summary ?? '').slice(0, 50) + '…'
+                      : task.summary ?? ''}
                   </td>
                   <td className="p-2 space-x-2 whitespace-nowrap">
                     <button
@@ -165,9 +165,9 @@ export default function PostsPage() {
             </p>
             <p>
               <span className="font-semibold">Summary:</span>{' '}
-              {task.summary.length > 50
-                ? task.summary.slice(0, 50) + '…'
-                : task.summary}
+              {(task.summary?.length ?? 0) > 50
+                ? (task.summary ?? '').slice(0, 50) + '…'
+                : task.summary ?? ''}
             </p>
             <div className="mt-2 space-x-2">
               <button

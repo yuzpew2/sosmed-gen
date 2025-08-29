@@ -9,7 +9,7 @@ type Task = {
   prompt_id: number
   status: string
   result: string
-  summary: string
+  summary: string | null
 }
 
 type RawTask = Omit<Task, 'videoUrl'> & { video_url: string }
@@ -28,6 +28,7 @@ export default function PostsPage() {
       const tasks = (data.tasks || []).map((t: RawTask): Task => ({
         ...t,
         videoUrl: t.video_url,
+        summary: t.summary ?? '',
       }))
       setTasks(tasks)
     } catch (err) {
@@ -100,7 +101,7 @@ export default function PostsPage() {
                     </span>
                   </td>
                   <td className="p-2">
-                    {task.summary.length > 50
+                    {(task.summary?.length ?? 0) > 50
                       ? task.summary.slice(0, 50) + '…'
                       : task.summary}
                   </td>
@@ -165,7 +166,7 @@ export default function PostsPage() {
             </p>
             <p>
               <span className="font-semibold">Summary:</span>{' '}
-              {task.summary.length > 50
+              {(task.summary?.length ?? 0) > 50
                 ? task.summary.slice(0, 50) + '…'
                 : task.summary}
             </p>
